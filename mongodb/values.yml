@@ -1,0 +1,9 @@
+service:
+  env: dev
+deployment:
+  imageDocrepo: balaji1729/mongodb
+  imageVersion: v1
+  zone: us-east-1c
+  cpulimit: 300m
+  memorylimit: 256Mi
+  env: dev

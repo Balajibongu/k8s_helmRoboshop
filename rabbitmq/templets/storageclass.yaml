@@ -1,0 +1,8 @@
+#this will be created by K8S admin
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ebs-rabbitmq
+reclaimPolicy: Retain
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer

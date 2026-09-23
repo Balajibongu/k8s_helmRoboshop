@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  namespace: roboshop
+  # these are replica set labels
+  labels:
+    project: roboshop
+    component: rabbitmq
+    tier: db
+spec:
+  replicas: 1
+  serviceName: "rabbitmq-headless"
+  selector:
+    # these labels are used to select pods
+    matchLabels:
+      project: roboshop
+      component: rabbitmq
+      tier: db
+  # pod definition
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        component: rabbitmq
+        tier: db
+    spec:
+      containers:
+      - name: rabbitmq
+        image: {{.Values.statefulset.imageDocrepo}}:{{.Values.statefulset.imageVersion}}
+        imagePullPolicy: Always
+        readinessProbe:
+          tcpSocket:
+            port: 5672
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 5672
+          initialDelaySeconds: 20
+          periodSeconds: 5
+        resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: {{.Values.statefulset.cpulimit}}
+              memory: {{.Values.statefulset.memorylimit}}
+        volumeMounts:
+          - mountPath: /var/lib/rabbitmq
+            name: rabbitmq-volume 
+      nodeSelector:
+                topology.kubernetes.io/zone: {{.Values.statefulset.zone}}
+  volumeClaimTemplates:
+      - metadata:
+          name: rabbitmq-volume
+        spec:
+          accessModes: [ "ReadWriteOnce" ]
+          storageClassName: "ebs-rabbitmq"
+          resources:
+            requests:
+              storage: 1Gi

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: roboshop
+  labels:
+    name: roboshop
+    env: {{.Values.deployment.env}}
+    running: mongodb
+
+spec:
+  replicas: 1
+  serviceName: "mongodb-headless"
+  selector:
+    matchLabels:
+      name: roboshop
+      env: {{.Values.deployment.env}}
+      running: mongodb
+
+  template:
+    metadata:
+      labels:
+        name: roboshop
+        env: {{.Values.deployment.env}}
+        running: mongodb
+
+    spec:
+      containers:
+        - name: mongodb
+          image: {{.Values.deployment.imageDocrepo}}:{{.Values.deployment.imageVersion}}
+          imagePullPolicy: Always
+
+          ports:
+            - name: mongodb
+              containerPort: 27017
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: {{.Values.deployment.cpulimit}}
+              memory: {{.Values.deployment.memorylimit}}
+          readinessProbe:
+            tcpSocket:
+              port: mongodb
+            failureThreshold: 1
+            periodSeconds: 20
+          livenessProbe:
+            tcpSocket:
+              port: mongodb
+            failureThreshold: 1
+            periodSeconds: 30
+          volumeMounts:
+          - mountPath: /data/db
+            name: mongodb-volume 
+      nodeSelector:
+        topology.kubernetes.io/zone: {{.Values.deployment.zone}}
+  volumeClaimTemplates:
+      - metadata:
+          name: mongodb-volume
+        spec:
+          accessModes: [ "ReadWriteOnce" ]
+          storageClassName: "ebs-mongodb"
+          resources:
+            requests:
+              storage: 1Gi

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart
+  namespace: roboshop
+  labels:
+    name: roboshop
+    env: {{.Values.manifest.env}}
+    running: cart
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      name: roboshop
+      env: {{.Values.manifest.env}}
+      running: cart
+  template:
+    metadata:
+      labels:
+        name: roboshop
+        env: {{.Values.manifest.env}}
+        running: cart
+    spec:
+      containers:
+      - name: catalogue
+        image: {{.Values.manifest.imageDocrepo}}:{{.Values.manifest.imageVersion}}
+        imagePullPolicy: Always
+        ports:
+        - name: liveness-port
+          containerPort: 8080
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: {{.Values.manifest.cpulimit}}
+            memory: {{.Values.manifest.memorylimit}}
+        envFrom:
+        - configMapRef:
+            name: cart
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: liveness-port
+          failureThreshold: 1
+          periodSeconds: 20
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: liveness-port
+          failureThreshold: 1
+          periodSeconds: 30 

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: roboshop
+  # these are replica set labels
+  labels:
+    project: roboshop
+    component: redis
+    tier: db
+spec:
+  replicas: 1
+  serviceName: "redis-headless"
+  selector:
+    # these labels are used to select pods
+    matchLabels:
+      project: roboshop
+      component: redis
+      tier: db
+  # pod definition
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        component: redis
+        tier: db
+    spec:
+      containers:
+      - name: redis
+        image: {{.Values.statefulset.imageDocrepo}}:{{.Values.statefulset.imageVersion}}
+        imagePullPolicy: Always
+        readinessProbe:
+          tcpSocket:
+            port: 6379
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 6379
+          initialDelaySeconds: 20
+          periodSeconds: 5
+        resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+        volumeMounts:
+          - mountPath: /data/
+            name: redis-volume 
+      nodeSelector:
+            topology.kubernetes.io/zone: us-east-1c
+  volumeClaimTemplates:
+      - metadata:
+          name: redis-volume
+        spec:
+          accessModes: [ "ReadWriteOnce" ]
+          storageClassName: "ebs-redis"
+          resources:
+            requests:
+              storage: 1Gi

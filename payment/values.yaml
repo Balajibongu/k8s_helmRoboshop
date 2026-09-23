@@ -1,0 +1,13 @@
+manifest:
+  imageDocrepo: balaji1729/payment
+  imageVersion: v1
+  cpulimit: 300m
+  memorylimit: 256Mi
+  env: dev
+service:
+  env: dev
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 10
+  averageUtilization: 50
+  env: dev

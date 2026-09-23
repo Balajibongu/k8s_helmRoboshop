@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: roboshop
+  # these are replica set labels
+  labels:
+    project: roboshop
+    component: mysql
+    tier: db
+spec:
+  serviceName: "mysql-headless"
+  replicas: 1
+  selector:
+    # these labels are used to select pods
+    matchLabels:
+      project: roboshop
+      component: mysql
+      tier: db
+  # pod definition
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        component: mysql
+        tier: db
+    spec:
+      containers:
+      - name: mysql
+        image: {{.Values.statefulset.imageDocrepo}}:{{.Values.statefulset.imageVersion}}
+        imagePullPolicy: Always
+        # readinessProbe:
+        #   tcpSocket:
+        #     port: 3306
+        #   initialDelaySeconds: 10
+        #   periodSeconds: 10
+        # livenessProbe:
+        #   tcpSocket:
+        #     port: 3306
+        #   initialDelaySeconds: 20
+        #   periodSeconds: 5
+        resources:
+            requests:
+              cpu: 300m
+              memory: 512Mi
+            limits:
+              cpu: {{.Values.statefulset.cpulimit}}
+              memory: {{.Values.statefulset.memorylimit}}
+        volumeMounts:
+          - mountPath: /data/db
+            name: mysql-volume 
+          - name: mysql-config
+            mountPath: /etc/mysql/conf.d/my.cnf
+            subPath: my.cnf
+      nodeSelector:
+                topology.kubernetes.io/zone: {{.Values.statefulset.zone}}
+      volumes:
+        - name: mysql-config
+          configMap:
+            name: mysql
+
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-volume
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: ebs-mysql
+        resources:
+          requests:
+            storage: 1Gi

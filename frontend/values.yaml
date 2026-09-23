@@ -1,0 +1,9 @@
+manifest:
+  imageDocrepo: balaji1729/frontend
+  imageVersion: v1
+  cpulimit: 300m
+  memorylimit: 256Mi
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 10
+  averageUtilization: 50

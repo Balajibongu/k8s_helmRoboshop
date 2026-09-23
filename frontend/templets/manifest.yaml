@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: roboshop
+  # these are replica set labels
+  labels:
+    project: roboshop
+    component: frontend
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    # these labels are used to select pods
+    matchLabels:
+      project: roboshop
+      component: frontend
+      tier: frontend
+  # pod definition
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        component: frontend
+        tier: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: {{.Values.manifest.imageDocrepo}}:{{.Values.manifest.imageVersion}}
+        imagePullPolicy: Always
+        ports:
+        - name: liveness-port
+          containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: liveness-port
+          failureThreshold: 1
+          periodSeconds: 15
+        livenessProbe:
+          httpGet:
+            path: /
+            port: liveness-port
+          failureThreshold: 1
+          periodSeconds: 15
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: {{.Values.manifest.cpulimit}}
+            memory: {{.Values.manifest.memorylimit}}
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: frontend
