@@ -50,7 +50,7 @@ spec:
           - mountPath: /data/
             name: redis-volume 
       nodeSelector:
-            topology.kubernetes.io/zone: us-east-1c
+            topology.kubernetes.io/zone: {{.Values.statefulset.zone}}
   volumeClaimTemplates:
       - metadata:
           name: redis-volume
