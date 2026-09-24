@@ -22,7 +22,7 @@ spec:
         running: user
     spec:
       containers:
-      - name: catalogue
+      - name: user
         image: {{.Values.manifest.imageDocrepo}}:{{.Values.manifest.imageVersion}}
         imagePullPolicy: Always
         ports:
