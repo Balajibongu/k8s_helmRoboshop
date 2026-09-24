@@ -10,7 +10,7 @@ spec:
 
   selector:
     name: roboshop
-    env: {{ .Values.deployment.env }}
+    env: dev
     running: mongodb
 
   ports:
