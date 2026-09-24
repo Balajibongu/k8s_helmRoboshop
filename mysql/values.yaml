@@ -2,6 +2,6 @@
 statefulset:
   imageDocrepo: balaji1729/mysql
   imageVersion: v1
-  zone: us-east-1c
+  zone: us-east-1b
   cpulimit: 500m
   memorylimit: 1024Mi

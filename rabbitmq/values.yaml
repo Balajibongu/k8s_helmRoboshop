@@ -1,6 +1,6 @@
 statefulset:
   imageDocrepo: rabbitmq
   imageVersion: 3
-  zone: us-east-1c
+  zone: us-east-1b
   cpulimit: 300m
   memorylimit: 256Mi

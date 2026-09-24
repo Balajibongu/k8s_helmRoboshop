@@ -1,6 +1,6 @@
 statefulset:
   imageDocrepo: redis
   imageVersion: 7.0
-  zone: us-east-1c
+  zone: us-east-1b
   cpulimit: 300m
   memorylimit: 256Mi

@@ -4,7 +4,7 @@
 deployment:
   imageDocrepo: balaji1729/mongodb
   imageVersion: v1
-  zone: us-east-1c
+  zone: us-east-1b
   cpulimit: 300m
   memorylimit: 256Mi
   env: dev
